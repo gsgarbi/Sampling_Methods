@@ -95,9 +95,9 @@ def sample_next(array_samples):
 #test_code = slice_sampling(50, 0.2)
 #print (test_code)
 
-## uncomment once to test sampling method by plotting
-## create custom experiment or use example from N(1,0) with initial point 0.2
-## slice_sampling(5000, 0.2) saved in 'N01_5000_0.2.csv'
-#df=pd.read_csv('N01_5000_0.2.csv', sep=',',header=None)
-#samples = df.values.T
-#render_plot(samples)
+# uncomment once to test sampling method by plotting
+# create custom experiment or use example from N(1,0) with initial point 0.2
+# slice_sampling(5000, 0.2) saved in 'N01_5000_0.2.csv'
+df=pd.read_csv('examples/N01_5000_0.2.csv', sep=',',header=None)
+samples = df.values.T
+render_plot(samples)
