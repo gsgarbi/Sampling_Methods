@@ -54,7 +54,7 @@ def render_plot(samples):
     num_bins = 80
     
     # the histogram of the data
-    n, bins, patches = ax.hist(samples, num_bins, normed = True, 
+    n, bins, patches = ax.hist(samples, num_bins, density = True, 
                                alpha = 0.75, linewidth = 0.2)
  
     # add a 'best fit' line
@@ -67,6 +67,10 @@ def render_plot(samples):
     
     # Tweak spacing to prevent clipping of ylabel
     fig.tight_layout()
+    plt.savefig('plot_examples/N01_5000', dpi=None, facecolor='w', 
+            edgecolor='w',orientation='portrait', papertype=None, format=None,
+            transparent=False, bbox_inches=None, pad_inches=0.1,
+            frameon=None)
     plt.show()
     
 # returns next sample
@@ -98,6 +102,6 @@ def sample_next(array_samples):
 # uncomment once to test sampling method by plotting
 # create custom experiment or use example from N(1,0) with initial point 0.2
 # slice_sampling(5000, 0.2) saved in 'N01_5000_0.2.csv'
-df=pd.read_csv('examples/N01_5000_0.2.csv', sep=',',header=None)
-samples = df.values.T
-render_plot(samples)
+#df=pd.read_csv('data_examples/N01_5000_0.2.csv', sep=',',header=None)
+#samples = df.values.T
+#render_plot(samples)
