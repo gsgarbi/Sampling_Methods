@@ -2,29 +2,14 @@
 # paper: Slice Sampling (by Radford M. Neal)
 # Author: Giorgio Sgarbi
 
-import scipy as sp
+import scipy.stats as stats
 import numpy as np
 import sympy as sym
+t = sym.Symbol('t')
+
 import matplotlib.pyplot as plt
 import pandas as pd
-
 import csv
-
-
-# function
-# use sym notation or np notation
-## note for developer: if, for instance, np.exp is used, 
-## sym will not recognize it as a valid operation    
-def f(x, mu = 0, sigma = 1, NP = False):
-    if NP:
-        y = (1 / (np.sqrt(2 * np.pi) * sigma) *
-         np.exp(-0.5 * (1 / sigma * (x - mu)) ** 2))
-    else:
-        y = (1 / (sym.sqrt(2 * sym.pi) * sigma) *
-         sym.exp(-0.5 * (1 / sigma * (x - mu)) ** 2))
-
-    return (y)
-
 
 # returns array of samples
 # num_samples: number of desired samples
@@ -45,6 +30,42 @@ def slice_sampling(num_samples, x_0):
         array_samples = np.append(array_samples, next_sample)
         
     return (array_samples)
+
+# returns next sample
+# array_sample: current array of samples already drawn
+def sample_next(array_samples):
+    # previous sample is the last sample in the array of samples
+    previous_sample = array_samples[-1]
+    
+    # draw y uniformly from (0, f(previous_sample))
+    y = stats.uniform.rvs(loc = 0, scale = f(previous_sample))
+    
+    # Assuming it is possible, find intersections of g(x) = y and f(x)
+    intersections = sym.solve(f(t) - y, t)
+
+    # find interval I = (L,R) for unimodal
+    assert len(intersections) == 2
+    [L,R] = np.asanyarray(intersections, dtype = float)
+    
+    # draw next_sample uniformly(?) from I
+    next_sample = L + (R - L) * stats.uniform.rvs()
+    
+    return (next_sample)
+
+
+# function
+# use sym notation or np notation
+## note for developer: if, for instance, np.exp is used, 
+## sym will not recognize it as a valid operation    
+def f(x, mu = 0, sigma = 1, NP = False):
+    if NP:
+        y = (1 / (np.sqrt(2 * np.pi) * sigma) *
+         np.exp(-0.5 * (1 / sigma * (x - mu)) ** 2))
+    else:
+        y = (1 / (sym.sqrt(2 * sym.pi) * sigma) *
+         sym.exp(-0.5 * (1 / sigma * (x - mu)) ** 2))
+
+    return (y)
 
 
 # render plot
@@ -73,35 +94,20 @@ def render_plot(samples):
             frameon=None)
     plt.show()
     
-# returns next sample
-# array_sample: current array of samples already drawn
-def sample_next(array_samples):
-    # previous sample is the last sample in the array of samples
-    previous_sample = array_samples[-1]
-    
-    # draw y uniformly from (0, f(previous_sample))
-    y = sp.stats.uniform.rvs(loc = 0, scale = f(previous_sample))
-    
-    # find intersections of g(x) = y and f(x)
-    intersections = sym.solve(f(t) - y, t)
 
-    # find interval I = (L,R) for unimodal
-    assert len(intersections) == 2
-    [L,R] = np.asanyarray(intersections, dtype = float)
-    
-    # draw next_sample uniformly(?) from I
-    next_sample = L + (R - L) * sp.stats.uniform.rvs()
-    
-    return (next_sample)
     
 
-## uncomment once to test sampling_method function
-#test_code = slice_sampling(50, 0.2)
-#print (test_code)
+# uncomment once to test sampling_method function
+test_code = slice_sampling(50, 0.2)
+print (test_code)
+render_plot(test_code)
 
-# uncomment once to test sampling method by plotting
-# create custom experiment or use example from N(1,0) with initial point 0.2
-# slice_sampling(5000, 0.2) saved in 'N01_5000_0.2.csv'
+## uncomment once to test sampling method by plotting
+## create custom experiment or use example from N(1,0) with initial point 0.2
+## slice_sampling(5000, 0.2) saved in 'N01_5000_0.2.csv'
+samples = slice_sampling(5000, 0.2)
+
+
 #df=pd.read_csv('data_examples/N01_5000_0.2.csv', sep=',',header=None)
 #samples = df.values.T
 #render_plot(samples)
