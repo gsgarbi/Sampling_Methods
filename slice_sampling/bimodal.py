@@ -1,4 +1,4 @@
-# Slice sampling for unimodal distributions
+# Slice sampling for biimodal distribution: 0.2N(-10, 1) + 0.8N(10, 1)
 # paper: Slice Sampling (by Radford M. Neal)
 # Author: Giorgio Sgarbi
 
@@ -17,21 +17,15 @@ import csv
 def slice_sampling(num_samples, x_0):
     #check if density at initial point is postive
     assert f(x_0) > 0
-    print("initial sample is", x_0)
     
     # initialize array with x_0
     array_samples = np.array([x_0])
 
     for i in range(num_samples - 1):
-        
-        print("----------BEGIN ITERATION #", i)
-        
         previous_sample = array_samples[-1]
-        print("previous sample is ", previous_sample)
         
         # draw y uniformly from (0, f(previous_sample))
         y = float(stats.uniform.rvs(loc = 0, scale = f(previous_sample)))
-        print("y is ", y)
         
         # find I
         [L, R] = find_I(y)
@@ -41,16 +35,10 @@ def slice_sampling(num_samples, x_0):
         
         # sample next x
         next_sample = sample_from_S(previous_sample, y, L, R)
-        print("accepted sample is ", next_sample)
         
         ## add nextx to samples 
-        ## (note for developers: np.append does NOT occur in place)
+        ## (note for self: np.append does NOT occur in place)
         array_samples = np.append(array_samples, next_sample)
-        
-        
-        print("----------END ITERATION #", i)
-        print("")
-        
         
         
     return (array_samples)
@@ -80,19 +68,12 @@ def sample_from_S(previous_sample, y, L, R):
     f_candidate = float(f(candidate_sample))
     
     if f_candidate > y: #base case
-        print("f(candidate) =", f_candidate , " > ", y, "\n", candidate_sample, " accepted!")
         return (float(candidate_sample))
     else:
-        print("f(candidate) =", f_candidate , " < ", y, "\n", candidate_sample, " rejected!")
-        print("Shrink interval")
         if candidate_sample < previous_sample:
-            print(candidate_sample, " < ", previous_sample, "\n", 
-                  "-> new interval: ", [candidate_sample, R])
             return(sample_from_S(previous_sample, y, 
                         candidate_sample, R))
         else:
-            print(candidate_sample, " > ", previous_sample, "\n", 
-                  "-> new interval: ", [L, candidate_sample])
             return(sample_from_S(previous_sample, y, 
                         L, candidate_sample))
 
@@ -134,7 +115,7 @@ def f(x, mu1 = -10, sigma1 = 1, mu2 = 10, sigma2 = 1, NP = False):
         y2 = (1 / (sym.sqrt(2 * sym.pi) * sigma2) *
          sym.exp(-0.5 * (1 / sigma2 * (x - mu2)) ** 2))
 
-    return ((y1 + y2) / 2)
+    return (0.2 * y1 + 0.8 * y2)
 
 
 # render plot
@@ -149,8 +130,6 @@ def render_plot(samples):
  
     # add a 'best fit' line
     y = f(bins, NP = True)
-    print(y)
-    print(y.shape)
     ax.plot(bins, y, '-', color = 'orange', linewidth = 3)
     ax.set_xlabel('Samples')
     ax.set_ylabel('Probability density')
@@ -158,25 +137,12 @@ def render_plot(samples):
     
     # Tweak spacing to prevent clipping of ylabel
     fig.tight_layout()
-    plt.savefig('plot_examples/N01_5000', dpi=None, facecolor='w', 
+    plt.savefig('plot_examples/Normal_mixture', dpi=None, facecolor='w', 
             edgecolor='w',orientation='portrait', papertype=None, format=None,
             transparent=False, bbox_inches=None, pad_inches=0.1,
             frameon=None)
     plt.show()
     
 
-    
-
-# uncomment once to test sampling_method function
-#test_code = slice_sampling(50, 10.1)
-#render_plot(test_code)
-#print (test_code)
-
-## uncomment once to test sampling method by plotting
-## create custom experiment or use example from N(-10,1) + N(10,1) with initial point 10.1
-## slice_sampling(5000, 10.1) saved in 'N_-10_1_10_1_5000_0.2.csv'
 samples = slice_sampling(5000, 10.1)
 render_plot(samples)
-#df=pd.read_csv('data_examples/N01_5000_0.2.csv', sep=',',header=None)
-#samples = df.values.T
-#render_plot(samples)
