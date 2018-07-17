@@ -1,13 +1,12 @@
 \documentclass[10pt]{article}
 \usepackage{bigints}
+\usepackage{listings}
 \begin{document}
 \large
 \begingroup\makeatletter\def\f@size{15}\check@mathfonts
-$x \in \chi$, where $\chi$ is the support of distribution $f(x)$ (assume $f(x)$ is a a distribution, i.e, the proportional function in the Slice Sampling paper was normalized)
-$$U = \left\{ (x,y): y \leq f(x) \right\}  $$
-Can I use the following as the definition for: $f(x)$ is an invariant distribution for the kernel K? Or is this just one sufficient condition? (unique in the Slice Sampling case).
 
-$$\int_{(x,y)\in U}f(x,y)K((x,y),(x',y'))dydx = f(x',y')$$
 \endgroup
+
+\lstinputlisting[language=Python]{/Users/giorgiosgarbi/Work/SamplingMethods/slice_sampling/stepping_out_method.py}
 \end{document}
 

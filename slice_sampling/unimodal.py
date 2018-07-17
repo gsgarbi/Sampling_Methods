@@ -15,7 +15,7 @@ import csv
 # num_samples: number of desired samples
 # x_0: initial sample
 def slice_sampling(num_samples, x_0):
-    #check if density at initial point is postive
+    #check if density at initial point is positive
     assert f(x_0) > 0
     
     # initialize array with x_0
